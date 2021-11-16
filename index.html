@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecomence-site</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+</head>
+<body>
+
+    <!-- pop up start -->
+
+    <!-- Button trigger modal -->
+  
+  
+  <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Added Cart</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div id="cart-shop">
+                
+              </div>
+          </div>
+          <div class="modal-footer">
+            <div class="total">
+                <div class="d-flex justify-content-around align-items-center">
+                    <div class="">
+                         <h4 class="mr-2 mb-0 font-weight-bold">Total -</h4>
+                    </div>
+                     <div class="total">
+                         <h4>
+                             <span class="badge badge-primary total-cost mb-0">0</span>
+                         </h4>
+                     </div>
+                 </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- fgjfgfdpogdfgijgf -->
+    
+    <div class="container-fluid  bg-spec">
+        <div class="row">
+            <div class="col-12">
+                <div class="mt-2">
+                   <div class="container">
+                        <div class="row">
+                            <div class="col-12 vh-100">
+                                <div class="d-flex justify-content-between align-items-end nav">
+                                    <div class="">
+                                        <p class="h4 text-primary font-weight-bold">FakeStore</p>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="mr-2">
+                                            <input type="text" placeholder="Search" class="form-control" id="search">
+                                        </div>
+                                        <div class="mr-2">
+                                            <select name="" id="category" class="custom-select">
+                                                <option value="0">All Categories</option>
+                                            </select>
+                                        </div>
+                                        <div class="">
+                                            <button type="button" class="btn btn-danger preview" data-toggle="modal" data-target="#staticBackdrop">
+                                                <i class="fas fa-cart-plus"></i><sup><span class="badge rounded badge-primary counting-item mb-0 ml-2">0</span></sup>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="show-case" class="card-columns mt-3">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script>
+            let products = [];              
+
+            $.get('https://fakestoreapi.com/products',function (data) {
+                products = data ;
+                show(data)
+            })              
+
+            let toShort = (str,max = 30) => {
+                if(str.length > max){
+                    return str.substring(0,max)+'...'
+                }
+                return str
+            }              
+
+            function show(x) {
+                $('#show-case').empty()
+                x.map(product => {
+                    $('#show-case').append(`
+                    <div class="card card-bg shadow my-3">
+                        <div class="row no-gutters">
+                            <div class="col-5">
+                                <div class="">
+                                    <img src="${product.image}" class="img-card-top custom-img" alt="">
+                                </div>
+                            </div>
+                             <div class="col-7">
+                                <div class="card-body card-show shadow-sm" style="background-color:#eee">
+                                    <div class="card-title text-uppercase">${toShort(product.title)}</div>
+                                    <div class="card-text text-black-50">${toShort(product.description,50)}</div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                       <div class="">
+                                            <p class="font-weight-bold mb-0">$<span>${product.price}</span></p>
+                                       </div>
+                                        <button class="btn btn-primary add-cart-btn" data-id="${product.id}">Add-Cart</button>
+                                    </div>
+                                </div>
+                             </div>
+                        </div>     
+                    </div>
+                `)
+                })  
+            }              
+
+            $('#search').on('keyup',function () {
+                let typVal = $(this).val().toLowerCase();
+                console.log(typeof typVal);
+                if (typVal.trim()) {
+                    let searchItem = products.filter(product =>{
+                        if(product.title.toLocaleLowerCase().indexOf(typVal)>-1 || product.description.toLocaleLowerCase().indexOf(typVal)>-1 || product.price === Number(typVal)){
+                            return product;
+                        }  
+                    }) 
+                    show(searchItem)
+                } 
+            })              
+
+            //category section
+            $.get("https://fakestoreapi.com/products/categories",function (data) {
+                data.map(el => {
+                    $("#category").append(`
+                        <option value="${el}">${el}</option>
+                    `)
+                })
+            })
+
+            $("#show-case").delegate(".add-cart-btn","click",function () {
+                let currentId = $(this).attr("data-id");
+                let productInfo = products.filter(el => el.id == currentId)[0];    
+                
+                if($(".item-in-cart").toArray().map(el => el.getAttribute("data-id")).includes(currentId)){
+                    alert('It already added')
+                }else{
+                    $("#cart-shop").append(`
+                
+                         <div class="card border-0 item-in-cart" data-id="${productInfo.id}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                     <img src="${productInfo.image}" class="img-in-cart" alt="">
+                                     <button class="btn btn-outline-danger" id="remove-cart"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                                <p class='mt-2 text-black-50'>${productInfo.title}</p>
+                                <div class="d-flex justify-content-between justify-content-end align-items-baseline">
+                                    <div class="form-row">
+                                        <button class="btn btn-outline-primary minus-btn">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" class="form-control mx-2 w-25 quantity" unitPrice="${productInfo.price}" min='1' value='1'>
+                                        <button class="btn btn-outline-primary plus-btn">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                     <p class="mb-0 font-weight-bold price-cost">${productInfo.price}</p>
+                                </div>
+                            </div>
+                            <hr>
+                         </div>
+                         `)
+                         } 
+                totalAdd() ;
+            })              
+
+            $("#cart-shop").delegate("#remove-cart","click",function () {
+                $(this).parentsUntil('#cart-shop').remove();
+                totalAdd();
+            })              
+
+            $("#category").on("change",function () {
+                let changedVal = $(this).val();
+                console.log(changedVal);
+                if (changedVal != 0) {
+                    let searchItem = products.filter(product =>{
+                        if(product.category === changedVal){
+                            return product;
+                        }  
+                    }) 
+                    show(searchItem)
+                }else{
+                    show(products)
+                }
+            });
+
+            let totalAdd = () =>{
+                let count = $(".price-cost").toArray().length;
+                $(".counting-item").html(count);
+                
+                if(count > 0){
+                    let totalResult = $(".price-cost").toArray().map(el => el.innerHTML).reduce((x,y) => Number(x)+Number(y));
+                    $(".total-cost").html(totalResult) 
+                    $(".bb").remove();
+                }else{
+                    $("#cart-shop").html(`
+                        <div class="alert alert-danger bb" role="alert">
+                             This Card is Empty.
+                        </div>
+                    `)
+                    $(".total-cost").html(`0`);
+                }
+            }
+
+            $(".preview").click(function () {
+                let counts = $(".price-cost").toArray().length;
+                if(counts <= 0){
+                    $("#cart-shop").html(`
+                        <div class="alert alert-danger ss" role="alert">
+                             This Card is Empty.
+                        </div>
+                    `)
+                }else{
+                    $(".ss").remove();
+                }
+            })
+
+            $("#cart-shop").delegate(".plus-btn","click",function () {
+                let q = $(this).siblings(".quantity").val();
+                let p = $(this).siblings(".quantity").attr("unitPrice");
+                let newQ = Number(q)+1 ;
+                let addingPrice =  newQ*p ;
+                $(this).siblings(".quantity").val(newQ)
+                $(this).parentsUntil(".item-in-cart").find('.price-cost').html(addingPrice.toFixed(2));
+                totalAdd()
+            })
+
+            $("#cart-shop").delegate(".minus-btn","click",function () {
+                let q = $(this).siblings(".quantity").val();
+                let p = $(this).siblings(".quantity").attr("unitPrice");
+                if(q > 1){
+                    let newQ = Number(q)-1 ;
+                    $(this).siblings(".quantity").val(newQ)
+                    let addingPrice =  newQ*p ;
+                    $(this).parentsUntil(".item-in-cart").find('.price-cost').html(addingPrice.toFixed(2));
+                    totalAdd()
+                }
+            })
+
+            $("#cart-shop").delegate(".quantity","change keyup",function () {
+                let q = $(this).val();
+                let p = $(this).attr("unitPrice");
+                if(q > 1){
+                    let newQ = Number(q) ;
+                    $(this).val(newQ);
+                    let addingPrice =  newQ*p ;
+                    $(this).parentsUntil(".item-in-cart").find('.price-cost').html(addingPrice.toFixed(2));
+                    totalAdd()
+                }else{
+                    alert("more than one");
+                }
+            })
+
+            
+    </script>
+</body>
+</html>
+

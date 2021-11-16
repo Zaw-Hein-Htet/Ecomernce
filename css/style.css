@@ -1,0 +1,27 @@
+body{
+    background-image: linear-gradient(to right,#36D1DC,#5B86E5);
+}
+.custom-img{
+    height: 80px;
+    width : auto;
+    margin :70px auto;
+    display : block;
+}
+.card-show{
+
+}
+.card-bg{
+    border: none!important;
+}
+.nav{
+   
+}
+
+.bg-special{
+    background-image: linear-gradient(to right,#36D1DC,#5B86E5);
+}
+
+.img-in-cart{
+    height: 50px;
+    width : auto;
+}
